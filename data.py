@@ -43,3 +43,25 @@ def get_games(**kwargs):
     
     data.columns = ['Date', 'Visitor', 'Visitor Goals', 'Home', 'Home Goals', 'Extra', 'Attendance', 'Length', 'Notes']
     return data
+
+
+def ml_prep(df):
+    """Prepare DataFrame for Machine Learning by datatype conversions and filtering where Attendance or Time of Game was not recorded
+    Also drop games which were 'special', i.e., Outdoor or International games
+    """
+    
+    df['Date'] = pd.to_datetime(df['Date'])
+
+    df = df[df['Attendance'] != 'Not Recorded']
+    df = df[df['Length'] != 'Not Recorded']
+
+    try:
+        df = df[df['Notes'].isnull()]
+        df.drop(columns=['Notes'], inplace=True)
+    except:
+        pass
+
+    if df['Length'].dtype == 'object':
+        df['Length'] = df['Length'].apply(lambda x: int(x[0])*60 + int(x[2:]))
+
+    return df
