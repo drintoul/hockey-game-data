@@ -61,7 +61,22 @@ def ml_prep(df):
     except:
         pass
 
+    # Feature engineering
     if df['Length'].dtype == 'object':
         df['Length'] = df['Length'].apply(lambda x: int(x[0])*60 + int(x[2:]))
+
+    df['Home Win'] = df['Home Goals'] > df['Visitor Goals']
+    df['Extra Time'] = df['Extra'] != 'Regular'
+
+    df['Goal Diff'] = abs(df['Visitor Goals'] - df['Home Goals'])
+    df['Total Goals'] = abs(df['Visitor Goals'] + df['Home Goals'])
+
+    df['Close Game'] = df['Goal Diff'] < df['Goal Diff'].mean()
+    df['Blowout Game'] = df['Goal Diff'] > (df['Goal Diff'].mean() + df['Goal Diff'].std())
+    df['High Scoring'] = df['Total Goals'] > (df['Total Goals'].mean() + df['Total Goals'].std())
+    df['Low Scoring'] = df['Total Goals'] < (df['Total Goals'].mean() - df['Total Goals'].std())
+    
+    df['Long Game'] = df['Length'] > (df['Length'].mean() + df['Length'].std())
+    df['Short Game'] = df['Length'] < (df['Length'].mean() - df['Length'].std())
 
     return df
