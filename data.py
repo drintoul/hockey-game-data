@@ -34,10 +34,12 @@ def get_games(**kwargs):
             dfs = pd.read_html(f'https://www.hockey-reference.com/leagues/NHL_{year}_games.html')
             df = dfs[0]
             print (df.shape)
+            df = df[~data['G'].isnull()] # Don't include games which were rescheduled
             data = pd.concat([data, df], axis=0)
 
         except Exception as e: # if error, continue to next year
             print (e)
             continue
-
+    
+    data.columns = ['Date', 'Visitor', 'Visitor Goals', 'Home', 'Home Goals', 'Extra', 'Attendance', 'Length', 'Notes']
     return data
